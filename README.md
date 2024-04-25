@@ -12,7 +12,7 @@ View Election Results: Users can view the election results after casting their v
 
 ## Usage
 
-1.Clone the Repository:Clone the repository to your local machine using the following command:
+ 1.Clone the Repository:Clone the repository to your local machine using the following command:
    git clone https://github.com/prasathr0811/online-voting-system.git
    
 2. Open index.html: Open the index.html file in your preferred web browser.

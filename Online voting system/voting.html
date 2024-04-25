@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Voting System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .background-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('./images/vote.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(60%);
+    }
+
+    .form-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      animation: slide-in 0.5s ease-out;
+      overflow-y: auto;
+      max-height: 70%;
+    }
+
+    .form-container.ballot {
+      width: 400px;
+      animation: slide-in-ballot 0.5s ease-out;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #4caf50;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+
+    .ballot-container {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+    }
+
+    .ballot-container.visible {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ballot-container.form-container {
+      background-image: none;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .ballot-container.form-container h2 {
+      color: #4caf50;
+      font-size: 24px;
+      margin-bottom:10px;
+    }
+
+    .ballot-question {
+      margin-bottom: 15px;
+    }
+
+    .ballot-question p {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .ballot-question input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    .ballot-question label {
+      font-size: 18px;
+      margin-right: 20px;
+    }
+
+    .scroll-button {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 40px;
+      height: 40px;
+      background-color: #4caf50;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .scroll-button:hover {
+      background-color: #45a049;
+    }
+
+    .scroll-button img {
+      width: 20px;
+      height: 20px;
+      filter: invert(1);
+    }
+
+    .result-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8); /* White background with transparency */
+      z-index: 9999;
+      animation: slide-in-result 0.5s ease-out;
+    }
+
+    .result-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.8); /* White background with transparency */
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 400px;
+      height: 250px;
+    }
+
+    .result-box h2 {
+      color: #4caf50;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .result-content {
+      margin-bottom: 20px;
+    }
+
+    .result-content p {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .result-content span {
+      font-weight: bold;
+    }
+
+    .result-box button {
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .result-box button:hover {
+      background-color: #45a049;
+    }
+
+    @keyframes slide-in {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slide-in-ballot {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slide-in-result {
+      0% {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slide-in-vote-casted {
+      0% {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="background-image"></div>
+    <!-- Login and Registration Section -->
+    <div class="form-container" id="loginContainer">
+      <h2>Login</h2>
+      <form id="loginForm" onsubmit="return login()">
+        <div class="form-group">
+          <label for="loginUsername">Username:</label>
+          <input type="text" id="loginUsername" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password:</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+        <input type="submit" value="Login">
+      </form>
+      <p>Don't have an account? <a href="#" onclick="showRegistration()">Register now</a></p>
+    </div>
+
+    <div class="form-container" id="registrationContainer" style="display: none;">
+      <h2>Register</h2>
+      <form id="registrationForm" onsubmit="return register()">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" placeholder="Enter your name" required>
+        </div>
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+          <label for="aadhar">Aadhaar Number:</label>
+          <input type="text" id="aadhar" placeholder="Enter your Aadhar number" required>
+        </div>
+        <div class="form-group">
+          <label for="voterId">Voter ID:</label>
+          <input type="text" id="voterId" placeholder="Enter your Voter ID" required>
+        </div>
+        <div class="form-group">
+          <label for="mobile">Mobile Number:</label>
+          <input type="tel" id="mobile" placeholder="Enter your mobile number" required>
+        </div>
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" placeholder="Enter your age" required>
+        </div>
+        <input type="submit" value="Register">
+      </form>
+      <p id="registrationMessage"></p>
+      <p>Already have an account? <a href="#" onclick="showLogin()">Login here</a></p>
+    </div>
+
+    <!-- Ballot Section -->
+    <div class="container ballot-container" id="ballotContainer">
+      <div class="form-container ballot">
+        <h2>Ballot</h2>
+        <div class="ballot-question">
+          <p>Select your candidate:</p>
+          <input type="radio" id="candidate1" name="candidate" value="Candidate 1">
+          <label for="candidate1">Candidate 1</label><br>
+          <input type="radio" id="candidate2" name="candidate" value="Candidate 2">
+          <label for="candidate2">Candidate 2</label><br>
+          <input type="radio" id="candidate3" name="candidate" value="Candidate 3">
+          <label for="candidate3">Candidate 3</label><br>
+        </div>
+        <input type="button" value="Cast Vote" onclick="castVote()">
+        <p><a href="#" onclick="showResult()">Click here to View Result</a></p>
+      </div>
+    </div>
+    <!-- End of Ballot Section -->
+  </div>
+
+  <!-- Election Result Section -->
+  <div class="result-container" id="resultContainer">
+    <div class="result-box">
+      <h2>Election Result</h2>
+      <div class="result-content">
+        <p>Candidate 1: <span id="candidate1Result">0</span> votes</p>
+        <p>Candidate 2: <span id="candidate2Result">0</span> votes</p>
+        <p>Candidate 3: <span id="candidate3Result">0</span> votes</p>
+      </div>
+      <button onclick="goToLogin()">Back to Login</button>
+    </div>
+  </div>
+  <!-- End of Election Result Section -->
+
+  <script>
+    var users = [];
+    var votes = {
+      "Candidate 1": 0,
+      "Candidate 2": 0,
+      "Candidate 3": 0
+    };
+
+    function showRegistration() {
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("registrationContainer").style.display = "block";
+    }
+
+    function showLogin() {
+      document.getElementById("registrationContainer").style.display = "none";
+      document.getElementById("loginContainer").style.display = "block";
+    }
+
+    function register() {
+      var name = document.getElementById("name").value;
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+      var email = document.getElementById("email").value;
+      var aadhar = document.getElementById("aadhar").value;
+      var voterId = document.getElementById("voterId").value;
+      var mobile = document.getElementById("mobile").value;
+      var age = document.getElementById("age").value;
+
+      var errorMessage = "";
+
+      if (age < 18 || age > 90) {
+        errorMessage += "Age must be between 18 and 90.\n";
+      }
+
+      if (!validateAadhar(aadhar)) {
+        errorMessage += "Invalid Aadhar number. Aadhar must be a 12-digit number.\n";
+      }
+
+      if (errorMessage !== "") {
+        alert(errorMessage);
+        return false;
+      } else {
+        var user = {
+          name: name,
+          username: username,
+          password: password,
+          email: email,
+          aadhar: aadhar,
+          voterId: voterId,
+          mobile: mobile,
+          age: age
+        };
+        users.push(user);
+        document.getElementById("registrationMessage").innerText = "Registration successful. Please login.";
+        return false;
+      }
+    }
+
+    function validateAadhar(aadhar) {
+      var aadharRegex = /^\d{12}$/;
+      return aadharRegex.test(aadhar);
+    }
+
+    function login() {
+      var username = document.getElementById("loginUsername").value;
+      var password = document.getElementById("loginPassword").value;
+      var loggedIn = false;
+
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].username === username && users[i].password === password) {
+          loggedIn = true;
+          document.getElementById("loginContainer").style.display = "none";
+          document.getElementById("ballotContainer").classList.add("visible");
+          break;
+        }
+      }
+
+      if (!loggedIn) {
+        alert("Invalid username or password.");
+      }
+      return false;
+    }
+
+    function castVote() {
+      var selectedCandidate = document.querySelector('input[name="candidate"]:checked');
+      if (selectedCandidate) {
+        var candidate = selectedCandidate.value;
+        votes[candidate]++;
+        updateResult();
+        var voteCastedMessage = document.createElement("div");
+        voteCastedMessage.classList.add("vote-casted-message");
+        voteCastedMessage.innerText = "Vote casted for: " + candidate;
+        voteCastedMessage.style.animation = "slide-in-vote-casted 0.5s ease-out";
+        document.body.appendChild(voteCastedMessage);
+        setTimeout(function() {
+          document.body.removeChild(voteCastedMessage);
+        }, 2000);
+      } else {
+        alert("Please select a candidate to cast your vote.");
+      }
+    }
+
+    function updateResult() {
+      document.getElementById("candidate1Result").innerText = votes["Candidate 1"];
+      document.getElementById("candidate2Result").innerText = votes["Candidate 2"];
+      document.getElementById("candidate3Result").innerText = votes["Candidate 3"];
+    }
+
+    function goToLogin() {
+      document.getElementById("ballotContainer").style.display = "none";
+      document.getElementById("resultContainer").style.display = "none";
+      document.getElementById("loginContainer").style.display = "block";
+    }
+
+    function showResult() {
+      document.getElementById("ballotContainer").style.display = "none";
+      document.getElementById("resultContainer").style.display = "flex";
+      setTimeout(function() {
+        document.getElementById("resultContainer").style.display = "none";
+        document.getElementById("thankyouContainer").style.display = "block";
+      }, 30000); // 30 seconds
+    }
+  </script>
+  
+  <!-- Thank You Page -->
+  <div class="form-container" id="thankyouContainer" style="display: none;">
+    <h2>Thank You For Voting</h2>
+    <p>Your vote has been successfully casted. Your contribution matters!</p>
+    <p>"Voting is not only our right—it is our power." - Loung Ung</p>
+  </div>
+  <!-- End of Thank You Page -->
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

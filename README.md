@@ -14,9 +14,13 @@ View Election Results: Users can view the election results after casting their v
 
 1.Clone the Repository:Clone the repository to your local machine using the following command:
    git clone https://github.com/prasathr0811/online-voting-system.git
+   
 2. Open index.html: Open the index.html file in your preferred web browser.
+ 
 3. Register or Log In: If you're a new user, register with a unique username and password. If you're an existing user, log in with your credentials.
+
 4. Cast Your Vote: Use the ballot interface to select your preferred candidates and cast your vote.
+
 5. View Election Results: After casting your vote, you can view the election results to see the current standings.
 
 

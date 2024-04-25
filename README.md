@@ -1,3 +1,4 @@
+[Online Voting System.pdf](https://github.com/prasathr0811/Online-Voting-System/files/15110204/Online.Voting.System.pdf)
 # Online Voting System
 
 This project is an online voting system implemented using HTML, CSS, and JavaScript. It allows users to register, log in, cast their votes for different candidates, and view the election result.
